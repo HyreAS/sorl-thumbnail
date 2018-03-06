@@ -21,7 +21,6 @@ from sorl.thumbnail.helpers import (ThumbnailError, deserialize,
 from sorl.thumbnail.parsers import parse_geometry
 
 thread_local_data = threading.local()
-thread_local_data.storage_cache = {}
 
 url_pat = re.compile(r'^(https?|ftp):\/\/')
 
@@ -43,6 +42,8 @@ def deserialize_image_file(s):
 
     class LazyStorage(LazyObject):
         def _setup(self):
+            if not hasattr(thread_local_data, 'storage_cache'):
+                thread_local_data.storage_cache = {}
             if data['storage'] in thread_local_data.storage_cache:
                 self._wrapped = thread_local_data.storage_cache[data['storage']]
             else:
